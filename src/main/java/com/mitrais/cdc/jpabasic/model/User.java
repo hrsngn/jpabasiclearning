@@ -1,23 +1,17 @@
 package com.mitrais.cdc.jpabasic.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import java.util.Set;
 
 @Entity
 @Table(name="user")
+@JsonIdentityInfo(
+        generator = ObjectIdGenerators.PropertyGenerator.class,
+        property = "id")
 public class User {
 
     @Id
@@ -27,8 +21,9 @@ public class User {
     @Column(name = "user_name")
     private String name;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name="user_id")
+    //one to many bidirectional
+    @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
+//    @JoinColumn(name="user_id")
     private Set<Comment> comments;
 
     //one to one unidirectional
@@ -39,6 +34,31 @@ public class User {
     //one to one bidirectional
     @OneToOne(cascade = CascadeType.ALL,mappedBy = "user")
     private Money money;
+
+    //bidirectional
+    @ManyToMany
+    @JoinTable(
+            name="user_role",
+            joinColumns = { @JoinColumn(name= "user_id")},
+            inverseJoinColumns = { @JoinColumn(name = "role_id")})
+    private Set<Role> roles;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_bank",
+            joinColumns = { @JoinColumn(name = "user_id") },
+            inverseJoinColumns = { @JoinColumn(name = "bank_id") } )
+    private Set<Bank> banks;
+
+    @Enumerated(EnumType.STRING)
+    private Gender gender;
+
+    @Embedded
+    private Image image;
+
+    @ElementCollection
+    @CollectionTable(name="alias",joinColumns = @JoinColumn(name = "user_id"))
+    private Set<Alias> alias;
 
     public User() {
     }
@@ -68,27 +88,55 @@ public class User {
     public void setName(String name) {
         this.name = name;
     }
-
     public Set<Comment> getComments() {
         return comments;
     }
-
     public void setComments(Set<Comment> comments) {
         this.comments = comments;
     }
-
     public Money getMoney() {
         return money;
     }
-
     public void setMoney(Money money) {
         this.money = money;
     }
+    public Set<Role> getRoles() {
+        return roles;
+    }
 
-    //    @Override
-//    public String toString() {
-//        return "User{" +
-//                ", name='" + name + '\'' +
-//                '}';
-//    }
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public Set<Bank> getBanks() {
+        return banks;
+    }
+
+    public void setBanks(Set<Bank> banks) {
+        this.banks = banks;
+    }
+
+    public Image getImage() {
+        return image;
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
+    }
+
+    public Gender getGender() {
+        return gender;
+    }
+
+    public void setGender(Gender gender) {
+        this.gender = gender;
+    }
+
+    public Set<Alias> getAlias() {
+        return alias;
+    }
+
+    public void setAlias(Set<Alias> alias) {
+        this.alias = alias;
+    }
 }

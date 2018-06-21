@@ -1,6 +1,7 @@
 package com.mitrais.cdc.jpabasic.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import javax.persistence.*;
 
@@ -12,6 +13,11 @@ public class Comment {
     private Integer id;
 
     private String content;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+//    @JsonManagedReference
+    private User user;
 
     public Comment() {
     }
@@ -30,5 +36,13 @@ public class Comment {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
